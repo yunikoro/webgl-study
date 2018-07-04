@@ -5,13 +5,30 @@
     <title>webgl2</title>
 </head>
 <body>
+    <canvas id="c"></canvas>
+    <script src="./webgl-utils.js"></script>
     <script id="2d-vertex-shader" type="x-shader/x-vertex">
         attribute vec2 a_position;
         uniform vec2 u_resolution;
 
         void main() {
-            
+            vec2 zeroToOne = a_position / u_resolution
+            vec2 zeroToTwo = zeroToTwo * 2.0;
+            vec2 clipSpace = zeroToTwo - 1.0;
+
+            gl_Position = vec4(clipSpace, 0, 1);
         }
+    </script>
+    <script src="./my-webgl-utils.js"></script>
+    <script>
+        var canvas = document.querySelector('#c');
+        var gl = canvas.getContext('webgl');
+        if(!gl) {
+            alert('no webgl');
+        }
+
+        // var program = webglUtils.createProgramFromScripts(gl, nu);
+        myWebglUtils.createProgramFromScripts();
     </script>
 </body>
 </html>
