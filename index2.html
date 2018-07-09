@@ -16,14 +16,16 @@
             vec2 zeroToTwo = zeroToOne * 2.0;
             vec2 clipSpace = zeroToTwo - 1.0;
 
-            gl_Position = vec4(clipSpace, 0, 1);
+            gl_Position = vec4(clipSpace * vec2(1, -1), 0, 1);
         }
     </script>
     <script id="x2d-fragment-shader" type="x-shader/x-fragment">
         precision mediump float;
 
+        uniform vec4 u_color;
+
         void main() {
-            gl_FragColor = vec4(1, 0, 0.5, 1);
+            gl_FragColor = u_color;
         }
     </script>
     <script src="./my-webgl-utils.js"></script>
@@ -34,7 +36,52 @@
             alert('no webgl');
         }
 
-        myWebglUtils.createProgramFromScripts(gl, ['#x2d-vertex-shader', '#x2d-fragment-shader']);
+        var program = myWebglUtils.createProgramFromScripts(gl, ['#x2d-vertex-shader', '#x2d-fragment-shader']);
+
+        var positionAttributeLocation = gl.getAttribLocation(program, 'a_position');
+        var resolutionUniformLocation = gl.getUniformLocation(program, 'u_resolution');
+
+        var positionBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+
+        var positions = [
+            10, 20,
+            80, 20,
+            10, 30,
+            10, 30,
+            80, 20,
+            80, 30,
+        ];
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+        gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+
+        gl.clearColor(0, 0, 0, 0);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+
+        gl.useProgram(program);
+        gl.enableVertexAttribArray(positionAttributeLocation);
+        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+
+        var size = 2;
+        var type = gl.FLOAT;
+        var normalize = false;
+        var stride = 0;
+        var offset = 0;
+
+        gl.vertexAttribPointer(positionAttributeLocation, size, type, normalize, stride, offset);
+        gl.uniform2f(resolutionUniformLocation, gl.canvas.width, gl.canvas.height);
+        var primitiveType = gl.TRIANGLES;
+        var offset = 0;
+        var count = 6;
+        gl.drawArrays(primitiveType, offset, count);
+
+        var setRectangle = function(gl, x, y, width, height) {
+            var x1 = x;
+            var x2 = x + width;
+            var y1 = y;
+            var y2 = y + height;
+        }
+
     </script>
 </body>
 </html>
